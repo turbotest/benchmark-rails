@@ -1,0 +1,88 @@
+# The install definition contains the commands needed to create a Ubuntu
+# 22.04.3 LTS virtual machine capable of running your tests.
+#
+# This is where you install required programming languages, databases and other
+# supporting libraries.
+#
+# Your repository source code is available in the /src directory.
+#
+# The build installation is cached as a virtual machine image for subsequent
+# check runs. When the install section changes, the virtual machine image is
+# re-created.
+#
+# Installation commands are specified as a TOML multi-line string.
+#
+# N.B. Shell commands MUST execute non-interactively. For example, commands
+# requiring user input will hang until the check run is cancelled or after a
+# 15 minute timeout.
+[setup]
+packages = '''
+sudo apt update -y
+
+# Operating system dependencies
+sudo DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -yq \
+  build-essential cmake git-core libcurl4-openssl-dev libffi-dev \
+  libreadline-dev libsqlite3-dev libssl-dev libxml2-dev libxslt1-dev \
+  libyaml-dev pkg-config software-properties-common zlib1g-dev
+
+# Databases
+sudo DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -yq \
+  postgresql postgresql-contrib libpq-dev \
+  redis-server
+
+sudo su postgres -c "createuser $USER --superuser"
+echo 'host all all 127.0.0.1/32 trust' | sudo tee -a /etc/postgresql/14/main/pg_hba.conf
+sudo service postgresql restart
+
+# Ruby
+\curl -sSL https://get.rvm.io | bash -s -- --ignore-dotfiles
+echo "source $HOME/.rvm/scripts/rvm" >> ~/.bashrc
+source ~/.bashrc
+rvm install ruby-3.2.2
+gem update --system --no-doc
+
+# Rails
+bundle install
+bundle exec rails db:setup
+'''
+
+# The setup definition specifies commands to execute before running your test
+# suites.
+#
+# Use the setup definition to update your project dependencies or compile classes.
+# For example, in a ruby project here's where you run bundle install.
+#
+# Unlike the install definition, setup is not cached and therefore executes on
+# every build.
+test_suite = '''
+bundle install
+'''
+
+# Test suites are inferred from each TOML key ending with test_suite.
+#
+# Specify multiple test suites by adding test_suite keys. For example:
+# [test_suite."system tests"]
+# [test_suite.integration]
+#
+# Create a default test_suite if your build only requires one test suite.
+[test_suite.default]
+
+# A string specifying the command which executes one test file.
+#
+# The test file is passed as the last argument to the command.
+command = "bundle exec rails test"
+
+# An array of file path globs which expands to a list of files. File paths are
+# relative to the project directory.
+#
+# Each file is passed as the last argument to your test command.
+# Default Rails test
+files = ["test/**/*_test.rb"]
+
+# An array of file path globs which expands to a list of files. File paths are
+# relative to the project directory.
+#
+# No tests will be executed with any files matched in this definition section.
+ignore = [
+  "test/models/IGNORE_test.rb"
+]
