@@ -36,7 +36,7 @@ sudo service postgresql restart
 
 # Ruby
 \curl -sSL https://get.rvm.io | bash -s -- --ignore-dotfiles
-echo "source $HOME/.rvm/scripts/rvm" >> ~/.bashrc # Ensure RVM is enabled for shell sessions
+echo "source $HOME/.rvm/scripts/rvm" >> ~/.bash_profile # Ensure RVM is enabled for shell sessions
 source $HOME/.rvm/scripts/rvm # Use RVM in current shell
 rvm install ruby-3.2.2
 gem update --system --no-doc
