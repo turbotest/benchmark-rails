@@ -17,6 +17,7 @@
 # 15 minute timeout.
 [setup]
 packages = '''
+# clear-cache: 2e4c7425-afa8-4a6c-bdc6-ca5142e65deb
 sudo apt update -y
 
 # Operating system dependencies
