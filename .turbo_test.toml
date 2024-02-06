@@ -37,7 +37,7 @@ sudo service postgresql restart
 # Ruby
 \curl -sSL https://get.rvm.io | bash -s -- --ignore-dotfiles
 echo "source $HOME/.rvm/scripts/rvm" >> ~/.bashrc
-source ~/.bashrc
+source $HOME/.rvm/scripts/rvm
 rvm install ruby-3.2.2
 gem update --system --no-doc
 
@@ -56,6 +56,7 @@ bundle exec rails db:setup
 # every build.
 test_suite = '''
 bundle install
+bundle exec rails db:migrate
 '''
 
 # Test suites are inferred from each TOML key ending with test_suite.
